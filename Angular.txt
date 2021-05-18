@@ -1,0 +1,256 @@
+//TypeScript
+    //Tipos - OK
+    const tipoNumber: number = 2
+    var tipoString: string
+    let tipoBoolean: boolean
+    var tipoAny: any
+    let array: any[]
+    let arrayTupla: [string, boolean]
+    enum enumerador {
+        a, b=20, c='exemplo'
+    }
+    //Funções - OK
+    function dizOi(): string {
+        return 'ola'
+    }
+    const teste = function (params:string) {
+        console.log('testado')
+    }
+    let tipoFuncaoMultiplicar: (a: number, b: number) => number
+    //Classes
+        class Produto {
+            constructor(nome: string, preco: number, desconto: number = 0) {
+
+            }
+        }
+        const produto = new Produto('banana', 3)
+        const produtoDesconto = new Produto('pera', 5, 2)
+        //Herança
+        class Refrigerante extends Produto {
+
+            static id = 67;
+            constructor(preco: number, desconto: number) {
+                super('coca', preco, desconto)
+            }
+
+            get preco(): number {
+                return this.preco
+            }
+
+            set preco(valor: number) {
+                this.preco = valor;
+            }
+
+            static getRefrigeranteId(): number {
+                return this.id
+            }
+        }
+        //Construtor Privado & Singleton
+            //cria um construtor privado para limitar o acesso à classe
+            class Unico {
+                private static instance: Unico = new Unico
+                private constructor() {}
+
+                static getInstance() {
+                    return this.instance
+                }
+
+                agora() { //é possivel acessar agora atraves de Unico.getInstance mas não a partir de Unico
+                    return new Date()
+                }
+
+            }
+    //NameSpaces
+        //define um escopo para não termos conflitos em nomes de funções e variáveis quando usadas globalmentes
+        //por exemplo: utiliza o mesmo nome de função em 2 arquivos
+        //** é possível utilizar o mesmo namespace em arquivos diferentes, declarando os mesmos
+        namespace AreaEspecifica {
+            export function area(n: number, m: number): number {
+                return n*m;
+            }
+        }
+        function area(n: number): number {
+            return n*n;
+        }
+
+        console.log(area(10))
+        console.log(AreaEspecifica.area(10, 20))
+    //Módulos
+        //exemplo de modulo geometria.ts
+        export const PI = 3.14
+
+        export default function areaDoRetangulo(a, b) {
+            return a*b;
+        }
+
+        export function quadrado(a, b) {
+            return a*b;
+        }
+        //exemplo import modulo
+        import retangulo from './geometria.ts'//retangulo é um alias para o modulo retangulo declarado acima
+        import { quadrado as quad } from './geometria.ts'
+
+        console.log(retangulo(12, 22));
+        console.log(quad(2,3));
+    //Interfaces
+        interface Humano {
+            nome: string //atributo obrigatório
+            idade?: string //não obrigatório
+            [prop: string]: any //pode ser um atributo com qualquer nome e valor. Quantos atributos quiser
+            saudar(texto: string): void
+        }
+
+        function imprimirNome(pessoa: Humano): void {
+            console.log(pessoa.nome)
+        }
+
+        function popularPessoa(pessoa: Humano): void {
+            pessoa.nome= 'Jonas'
+            pessoa.idade= 'bacana'
+            pessoa.altura= 2.44
+            pessoa.largura= 122
+
+            console.log(pessoa)
+        }
+
+        const pessoa: Humano = {
+            nome: '',
+            saudar(texto) {
+                console.log(texto + this.nome)
+            }
+        }
+
+        popularPessoa(pessoa)
+        pessoa.saudar("oi eu sou")
+            
+        class Cliente implements Humano {
+            nome: string
+            novoAtributoExemplo: number
+            saudar(texto) {
+                console.log(texto + this.nome)
+            }
+        }
+
+        const cliente = new Cliente()
+        cliente.nome = 'Marquito'
+        cliente.novoAtributoExemplo = 1
+        cliente.saudar('ola ola aqui é')
+        //Interface Função
+            interface FuncaoCalculo {
+                (a:number, b:number): number
+            }
+
+            let potencia: FuncaoCalculo
+
+            potencia = function(base: number, expoente:number): number {
+                //Array(base).fill(expoente).reduce((t, a) => t * a)
+                return base ** expoente;
+            }
+    //Generics
+        //Com o generics é possível receber um preview das funções disponíveis para o tipo que está sendo utilizado
+        function exemplo<tipo>(a: tipo): tipo {
+            return a;
+        }
+
+        console.log(exemplo(25).length) //passando detect ele detecta o tipo e ja corrige caso tentemos fazer um encadeamento não permitido/que retorne undefined
+        console.log(exemplo('banana').length)
+        console.log(exemplo<Object>({nome: 'azedou'}))//é possível especificar o tipo na utilização do método
+            //Generics com Array
+            const lista: Array<string> = []
+
+            lista.push(2)
+            lista.push('perna')
+
+            function imprimir<T>(args: T[]) {
+                args.forEach(elemento => console.log(elemento))
+            }
+
+            imprimir<number>([1, 2, 3])
+            imprimir<string>(["a", "b"])
+
+            type Aluno = { nome: string, idade: number}
+            imprimir<Aluno>([{nome: 'marcos', idade: 2}])
+            //Generics com Tipo
+            type Echo = <T>(data: T) => T
+            const chamarEcho: Echo = imprimir
+            console.log(chamarEcho<number>(19))
+            //Generic com classes
+            abstract class Operacao<T, S> {
+                constructor(public primeiroValor: T, public segundoValor: S) {}
+
+                abstract execucao(): T 
+            }
+
+            class Soma extends Operacao<number, number> {
+
+                execucao(): number {
+                    return this.primeiroValor + this.segundoValor
+                }
+            }
+
+            console.log(new Soma(54, 11).execucao())
+
+            class Fila<T> {
+
+                private array: Array<T>
+
+                constructor(...args: T[]) {
+                    this.array = args
+                }
+
+                entrar(elemento: T) {
+                    this.array.push()
+                }
+
+                proximo(): T {
+                    const primeiro = this.array[0]
+                    this.array.splice(0, 1)
+                    return primeiro
+                }
+
+                imprimir() {
+                    console.log(this.array)
+                }
+            }
+
+            type Par<C, V> = {chave: C, valor: V}
+
+            class Mapa<C, V> {
+
+                itens: Array<Par<C, V>> = new Array<Par<C, V>>()
+
+                obter(chave: C): Par<C, V> | null {
+                    const resultado = this.itens
+                        .filter(i => i.chave === chave)
+                    return resultado ? resultado[0] : null
+                }
+
+                colocar(par: Par<C, V>) {
+                    const encontrado = this.obter(par.chave)
+                    if(encontrado) {
+                        encontrado.valor = par.valor
+                    } else {
+                        this.itens.push(par)
+                    }
+                }
+
+                limpar() {
+                    this.itens = new Array<Par<C, V>>()
+                }
+
+                imprimir() {
+                    console.log(this.itens)
+                }
+            }
+            //Decorators
+
+//Angular
+    //Componentes
+    //Módulos
+    //Diretivas
+    //Services
+    //Injeção de Dependências
+    //Pipes
+    //Navegação
+    //Observables
+    //Consumir uma API Rest
